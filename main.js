@@ -8,6 +8,7 @@ let snakePoints = [];
 
 let pixelsPerCM = null;
 let scaleFactor = 1;
+let referenceCM = null;
 
 document.getElementById('imageLoader').addEventListener('change', function(e) {
 
@@ -66,22 +67,7 @@ canvas.addEventListener('click', function(e) {
 
       drawLine(scalePoints[0], scalePoints[1], 'red');
 
-      const pixelDist = getDistance(
-        scalePoints[0],
-        scalePoints[1]
-      );
-
-      const knownCM = prompt(
-        'Enter the real-world length in cm between the two red points:'
-      );
-
-      if (knownCM && !isNaN(knownCM)) {
-
-        pixelsPerCM = pixelDist / parseFloat(knownCM);
-
-        document.getElementById('info').innerText =
-          'Now trace the snake body with clicks. Double click to finish.';
-      }
+      setReferenceLength();
     }
 
   } else {
@@ -105,6 +91,63 @@ canvas.addEventListener('click', function(e) {
 
 canvas.addEventListener('dblclick', function() {
 
+  calculateSnakeLength();
+});
+
+canvas.addEventListener('contextmenu', function(e) {
+
+  e.preventDefault();
+
+  if (snakePoints.length > 0) {
+
+    snakePoints.pop();
+
+    redrawCanvas();
+
+    document.getElementById('info').innerText =
+      `Last point removed. Remaining points: ${snakePoints.length}`;
+  }
+});
+
+function setReferenceLength() {
+
+  const pixelDist = getDistance(
+    scalePoints[0],
+    scalePoints[1]
+  );
+
+  const input = prompt(
+    'Enter the real-world reference length in cm:',
+    referenceCM || ''
+  );
+
+  if (input && !isNaN(input)) {
+
+    referenceCM = parseFloat(input);
+
+    pixelsPerCM = pixelDist / referenceCM;
+
+    document.getElementById('info').innerText =
+      `Reference updated: ${referenceCM} cm. Trace the snake body now.`;
+  }
+}
+
+function changeReferenceLength() {
+
+  if (scalePoints.length < 2) {
+
+    alert('You must first select two scale points.');
+
+    return;
+  }
+
+  setReferenceLength();
+
+  calculateSnakeLength();
+}
+
+function calculateSnakeLength() {
+
   if (snakePoints.length > 1 && pixelsPerCM) {
 
     let totalPixels = 0;
@@ -122,22 +165,7 @@ canvas.addEventListener('dblclick', function() {
     document.getElementById('info').innerText =
       `Measured snake length: ${realLength.toFixed(2)} cm`;
   }
-});
-
-canvas.addEventListener('contextmenu', function(e) {
-
-  e.preventDefault();
-
-  if (snakePoints.length > 0) {
-
-    snakePoints.pop();
-
-    redrawCanvas();
-
-    document.getElementById('info').innerText =
-      `Last point removed. Remaining points: ${snakePoints.length}`;
-  }
-});
+}
 
 function drawDot(x, y, color = 'black') {
 
@@ -177,7 +205,9 @@ function resetPoints() {
 
   scalePoints = [];
   snakePoints = [];
+
   pixelsPerCM = null;
+  referenceCM = null;
 }
 
 function redrawCanvas() {
