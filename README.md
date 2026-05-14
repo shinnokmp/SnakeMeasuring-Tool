@@ -3,7 +3,7 @@
 Inspired by the previously existing SerpWidgets,com, I decided to develop a similar efficient tool to help herpetologists and those working on snakes, just as myself to estimate the length of a snake, especially the venomous species which may prove difficult to handle easily.
 This tool allows you to measure the real-world length of a snake in a photograph by referencing a visible scale (e.g., a ruler or tape) in the same image. It supports curved path measurements along the snake's body for higher accuracy.
 
-## Free to use [here](https://shinnokmp.github.io/SnakeLength-Measurer/)
+## Free to use [here](https://shinnokmp.github.io/SnakeMeasuring-Tool/)
 
 Happy to work on this with anyone interested!😊
 
