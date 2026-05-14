@@ -2,22 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Snake Length Measuring Tool</title>
+  <title>Snake Length Measuring Tool | By Samuel</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<h2>Snake Measuring Tool</h2>
+<header>
+  <h1>Snake Measuring Tool</h1>
+  <div class="subtitle">Precision Morphometrics by <strong>[Your Name]</strong></div>
+</header>
 
-<input type="file" id="imageLoader" accept="image/*"><br>
+<div class="container">
+  <div id="info">
+    <strong>Instructions:</strong> Click two points on a known scale (e.g., a ruler in the photo), then click along the snake’s body to trace its path for an accurate measurement.
+  </div>
 
-<canvas id="canvas"></canvas>
+  <div class="upload-section">
+    <label for="imageLoader" style="display:block; margin-bottom:10px;">Select Reference Image:</label>
+    <input type="file" id="imageLoader" accept="image/*">
+  </div>
 
-<div id="info">Click two points on a known scale, then click along the snake’s body to trace its path.</div>
+  <canvas id="canvas"></canvas>
 
-<div id="buttons">
-  <button onclick="reset()">Reset</button>
+  <div id="buttons">
+    <button onclick="reset()">Reset Measurement</button>
+  </div>
 </div>
+
+<footer>
+  &copy; 2024 Samuel Itang | Inspired by Serpwidgets.com
+</footer>
+
 <script src="main.js"></script>
 </body>
 </html>
