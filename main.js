@@ -1,4 +1,134 @@
-s.length > 0) {
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let img = new Image();
+
+let scalePoints = [];
+let snakePoints = [];
+
+let pixelsPerCM = null;
+let scaleFactor = 1;
+
+document.getElementById('imageLoader').addEventListener('change', function(e) {
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+
+    img.onload = function() {
+
+      const maxWidth = window.innerWidth - 40;
+
+      scaleFactor = img.width > maxWidth
+        ? maxWidth / img.width
+        : 1;
+
+      canvas.width = img.width * scaleFactor;
+      canvas.height = img.height * scaleFactor;
+
+      ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(img, 0, 0);
+
+      resetPoints();
+
+      document.getElementById('info').innerText =
+        'Click two points on a known scale.';
+    };
+
+    img.src = event.target.result;
+  };
+
+  reader.readAsDataURL(e.target.files[0]);
+});
+
+canvas.addEventListener('click', function(e) {
+
+  if (!img.src) return;
+
+  const rect = canvas.getBoundingClientRect();
+
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  const x = ((e.clientX - rect.left) * scaleX) / scaleFactor;
+  const y = ((e.clientY - rect.top) * scaleY) / scaleFactor;
+
+  if (scalePoints.length < 2) {
+
+    scalePoints.push({ x, y });
+
+    drawDot(x, y, 'red');
+
+    if (scalePoints.length === 2) {
+
+      drawLine(scalePoints[0], scalePoints[1], 'red');
+
+      const pixelDist = getDistance(
+        scalePoints[0],
+        scalePoints[1]
+      );
+
+      const knownCM = prompt(
+        'Enter the real-world length in cm between the two red points:'
+      );
+
+      if (knownCM && !isNaN(knownCM)) {
+
+        pixelsPerCM = pixelDist / parseFloat(knownCM);
+
+        document.getElementById('info').innerText =
+          'Now trace the snake body with clicks. Double click to finish.';
+      }
+    }
+
+  } else {
+
+    snakePoints.push({ x, y });
+
+    const len = snakePoints.length;
+
+    drawDot(x, y, 'blue');
+
+    if (len > 1) {
+
+      drawLine(
+        snakePoints[len - 2],
+        snakePoints[len - 1],
+        'blue'
+      );
+    }
+  }
+});
+
+canvas.addEventListener('dblclick', function() {
+
+  if (snakePoints.length > 1 && pixelsPerCM) {
+
+    let totalPixels = 0;
+
+    for (let i = 0; i < snakePoints.length - 1; i++) {
+
+      totalPixels += getDistance(
+        snakePoints[i],
+        snakePoints[i + 1]
+      );
+    }
+
+    const realLength = totalPixels / pixelsPerCM;
+
+    document.getElementById('info').innerText =
+      `Measured snake length: ${realLength.toFixed(2)} cm`;
+  }
+});
+
+canvas.addEventListener('contextmenu', function(e) {
+
+  e.preventDefault();
+
+  if (snakePoints.length > 0) {
 
     snakePoints.pop();
 
